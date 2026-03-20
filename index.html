@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Créateur de sites web indépendant. Je transforme vos idées en expériences digitales performantes.">
+    <title>Créateur Web Indépendant - Votre Vision En Ligne</title>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;800;900&display=swap" rel="stylesheet">
+
+    <!-- GSAP & ScrollTrigger -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js" defer></script>
+
+    <style>
+        /* ==========================================================================
+           1. VARIABLES & RESET
+           ========================================================================== */
+        :root {
+            --bg-color: #050505;
+            --text-color: #FAFAFA;
+            --text-muted: #A0A0A0;
+            --accent-color: #E63946;
+            --font-main: 'Inter', sans-serif;
+            --spacing-section: clamp(4rem, 10vw, 8rem);
+            --container-padding: clamp(1rem, 5vw, 4rem);
+        }
+
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent; 
+        }
+
+        html {
+            scroll-behavior: smooth;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-main);
+            font-size: 16px;
+            overflow-x: hidden;
+        }
+
+        body {
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        *:focus { outline: none; }
+        *:focus-visible {
+            outline: 2px solid var(--text-color);
+            outline-offset: 4px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+
+        /* ==========================================================================
+           2. NAVIGATION & CURSEUR
+           ========================================================================== */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1.5rem var(--container-padding);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            background: linear-gradient(to bottom, rgba(5,5,5,0.9) 0%, rgba(5,5,5,0) 100%);
+            backdrop-filter: blur(5px);
+        }
+
+        .header__logo {
+            font-weight: 900;
+            font-size: 1.2rem;
+            color: var(--text-color);
+            letter-spacing: 1px;
+        }
+
+        .header__nav {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .header__nav a {
+            color: var(--text-color);
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .header__nav a:hover {
+            color: var(--accent-color);
+        }
+
+        @media (max-width: 600px) {
+            .header__nav { display: none; }
+        }
+
+        /* Curseur */
+        .cursor-dot, .cursor-circle {
+            position: fixed;
+            top: 0; left: 0;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0; 
+            transition: opacity 0.3s ease;
+        }
+
+        .cursor-dot {
+            width: 6px; height: 6px;
+            background-color: var(--accent-color);
+        }
+
+        .cursor-circle {
+            width: 40px; height: 40px;
+            border: 1px solid var(--text-color);
+            transition: width 0.3s ease, height 0.3s ease, background-color 0.3s ease, mix-blend-mode 0.3s, opacity 0.3s ease;
+        }
+
+        .cursor-circle--hover {
+            width: 60px; height: 60px;
+            background-color: var(--text-color);
+            mix-blend-mode: exclusion;
+            border-color: transparent;
+        }
+
+        /* ==========================================================================
+           3. TYPOGRAPHIE GLOBALE
+           ========================================================================== */
+        h1, h2, h3 {
+            font-weight: 900;
+            line-height: 1.1;
+        }
+
+        .section-title {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            margin-bottom: 1rem;
+            color: var(--text-color);
+            text-transform: uppercase;
+        }
+
+        .section-subtitle {
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            color: var(--text-muted);
+            margin-bottom: 3rem;
+            max-width: 600px;
+            font-weight: 400;
+            line-height: 1.6;
+        }
+
+        .text-accent { color: var(--accent-color); }
+
+        /* ==========================================================================
+           4. SECTIONS
+           ========================================================================== */
+        
+        /* --- HERO --- */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 0 var(--container-padding);
+            text-align: center;
+        }
+
+        .hero__title {
+            font-size: clamp(3rem, 10vw, 8rem);
+            text-transform: uppercase;
+            will-change: transform;
+            margin-bottom: 1rem;
+        }
+
+        .hero__desc {
+            font-size: clamp(1rem, 2.5vw, 1.5rem);
+            color: var(--text-muted);
+            max-width: 700px;
+            line-height: 1.5;
+            font-weight: 400;
+        }
+
+        .hero__scroll {
+            position: absolute;
+            bottom: 2rem;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-muted);
+            animation: bounce 2s infinite;
+        }
+
+        .hero__scroll::after {
+            content: '↓';
+            font-size: 1.2rem;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        /* --- SKILLS MARQUEE (Avantages clients) --- */
+        .skills {
+            padding: 3rem 0;
+            background-color: var(--text-color);
+            color: var(--bg-color);
+            overflow: hidden;
+            display: flex;
+            white-space: nowrap;
+        }
+
+        .skills__track {
+            display: flex;
+            animation: marquee 25s linear infinite;
+        }
+
+        .skills__item {
+            font-size: clamp(1.5rem, 3vw, 2.5rem);
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 0 2rem;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* --- PROJECTS --- */
+        .projects {
+            padding: var(--spacing-section) var(--container-padding);
+        }
+
+        .projects__grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: clamp(2rem, 4vw, 3rem);
+            margin-top: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .projects__grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        .project-card {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%);
+            transform: translateY(40px);
+            opacity: 0;
+            will-change: transform, opacity, clip-path;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .project-card__visual {
+            width: 100%;
+            aspect-ratio: 4/3; 
+            background-color: #1A1A1A;
+            border-radius: 8px; 
+            overflow: hidden;
+            position: relative;
+        }
+
+        .project-card__visual img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .project-card:hover .project-card__visual img {
+            transform: scale(1.05);
+        }
+
+        .project-card:hover .project-card__link {
+            color: var(--accent-color);
+        }
+
+        .project-card__title {
+            font-size: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .project-card__tag {
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .project-card__desc {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 0.5rem;
+        }
+
+        .project-card__link {
+            margin-top: auto;
+            font-size: 0.9rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            transition: color 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* --- CONTACT --- */
+        .contact {
+            padding: var(--spacing-section) var(--container-padding);
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .contact__intro {
+            font-size: clamp(1rem, 2vw, 1.2rem);
+            color: var(--text-muted);
+            margin-bottom: 3rem;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        .contact__form {
+            font-size: clamp(1.2rem, 3vw, 2.5rem);
+            font-weight: 500; 
+            line-height: 1.8;
+            max-width: 1000px;
+        }
+
+        .contact__input {
+            background: transparent;
+            border: none;
+            border-bottom: 2px dashed var(--text-muted); 
+            color: var(--accent-color);
+            font-family: inherit;
+            font-size: inherit;
+            font-weight: 800;
+            padding: 0 0.5rem;
+            margin: 0 0.2rem;
+            width: auto;
+            min-width: 200px;
+            border-radius: 0;
+            transition: border-color 0.3s ease;
+        }
+
+        .contact__input:focus,
+        .contact__input:focus-visible {
+            outline: none;
+            border-bottom: 2px solid var(--accent-color);
+        }
+
+        .contact__input::placeholder {
+            color: rgba(255, 255, 255, 0.15);
+            font-weight: 400;
+        }
+
+        .contact__footer {
+            margin-top: 4rem;
+            display: flex;
+        }
+
+        .btn-magnetic {
+            background-color: var(--accent-color);
+            color: var(--text-color);
+            border: none;
+            padding: 1.2rem 2.5rem;
+            font-size: 1.1rem;
+            font-family: inherit;
+            font-weight: 800;
+            text-transform: uppercase;
+            border-radius: 100px;
+            cursor: pointer;
+            will-change: transform;
+            transition: background-color 0.3s;
+        }
+
+        .btn-magnetic:hover {
+            background-color: #ff4a5a;
+        }
+
+        footer {
+            padding: 2rem var(--container-padding);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cursor-dot" aria-hidden="true"></div>
+    <div class="cursor-circle" aria-hidden="true"></div>
+
+    <header class="header">
+        <a href="#" class="header__logo hover-target">Atelier Digital.</a>
+        <nav class="header__nav">
+            <a href="#projets" class="hover-target">Mes réalisations</a>
+            <a href="#contact" class="hover-target">Me contacter</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1 class="hero__title">
+                VOTRE VISION<br>
+                <span class="text-accent">EN LIGNE</span>
+            </h1>
+            <p class="hero__desc">
+                Je transforme vos idées en sites internet performants et modernes pour attirer plus de clients et développer votre activité.
+            </p>
+            <div class="hero__scroll">Découvrir</div>
+        </section>
+
+        <section class="skills">
+            <div class="skills__track">
+                <span class="skills__item">SITES VITRINES</span><span class="skills__item">•</span>
+                <span class="skills__item">BOUTIQUES EN LIGNE</span><span class="skills__item">•</span>
+                <span class="skills__item">OPTIMISÉ SEO (GOOGLE)</span><span class="skills__item">•</span>
+                <span class="skills__item">ULTRA RAPIDE</span><span class="skills__item">•</span>
+                <span class="skills__item">100% ADAPTÉ MOBILE</span><span class="skills__item">•</span>
+                
+                <span class="skills__item">SITES VITRINES</span><span class="skills__item">•</span>
+                <span class="skills__item">BOUTIQUES EN LIGNE</span><span class="skills__item">•</span>
+                <span class="skills__item">OPTIMISÉ SEO (GOOGLE)</span><span class="skills__item">•</span>
+                <span class="skills__item">ULTRA RAPIDE</span><span class="skills__item">•</span>
+                <span class="skills__item">100% ADAPTÉ MOBILE</span><span class="skills__item">•</span>
+            </div>
+        </section>
+
+        <section class="projects" id="projets">
+            <h2 class="section-title">Mes Réalisations<span class="text-accent">.</span></h2>
+            <p class="section-subtitle">Découvrez quelques-uns de mes récents projets créés pour mes clients. Cliquez pour explorer les démos en direct.</p>
+            
+            <div class="projects__grid">
+                
+                <a href="demo-ecommerce.html" target="_blank" class="project-card hover-target">
+                    <div class="project-card__visual">
+                        <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=600&h=450&auto=format&fit=crop" alt="Aperçu d'une boutique en ligne minimaliste">
+                    </div>
+                    <h3 class="project-card__title">Boutique Minimaliste</h3>
+                    <span class="project-card__tag">E-commerce</span>
+                    <p class="project-card__desc">Création d'une boutique en ligne élégante pour vendre des produits physiques, avec un parcours d'achat optimisé.</p>
+                    <span class="project-card__link">Voir la démo ↗</span>
+                </a>
+
+                <a href="demo-vitrine.html" target="_blank" class="project-card hover-target">
+                    <div class="project-card__visual">
+                        <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=600&h=450&auto=format&fit=crop" alt="Aperçu d'un site vitrine d'entreprise">
+                    </div>
+                    <h3 class="project-card__title">Cabinet de Conseil</h3>
+                    <span class="project-card__tag">Site Vitrine</span>
+                    <p class="project-card__desc">Développement d'un site professionnel pour présenter les services d'une entreprise et rassurer les prospects.</p>
+                    <span class="project-card__link">Voir la démo ↗</span>
+                </a>
+
+                <a href="demo-portfolio.html" target="_blank" class="project-card hover-target">
+                    <div class="project-card__visual">
+                        <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=600&h=450&auto=format&fit=crop" alt="Aperçu d'un site portfolio créatif">
+                    </div>
+                    <h3 class="project-card__title">Studio d'Architecture</h3>
+                    <span class="project-card__tag">Portfolio & Design</span>
+                    <p class="project-card__desc">Un site sur-mesure mettant en valeur de grandes images pour présenter le savoir-faire d'un studio créatif.</p>
+                    <span class="project-card__link">Voir la démo ↗</span>
+                </a>
+
+            </div>
+        </section>
+
+        <section class="contact" id="contact">
+            <h2 class="section-title">Prêt à vous lancer ?</h2>
+            <p class="contact__intro">
+                Décrivez-moi votre idée en remplissant les champs ci-dessous. 
+                C'est le moyen le plus rapide pour que je comprenne votre besoin avant de vous recontacter !
+            </p>
+
+            <form class="contact__form" onsubmit="event.preventDefault(); alert('Message de test ! Plus tard, nous relierons ce bouton à votre boite mail.');">
+                Bonjour, je m'appelle 
+                <input type="text" class="contact__input hover-target" placeholder="votre nom" aria-label="Votre nom" required> 
+                et je gère 
+                <input type="text" class="contact__input hover-target" placeholder="votre entreprise" aria-label="Votre entreprise">. 
+                <br><br>
+                J'ai besoin de vos services pour 
+                <input type="text" class="contact__input hover-target" placeholder="créer un site internet, refaire mon logo..." aria-label="Votre projet" required>.
+                Vous pouvez me contacter à cette adresse :
+                <input type="email" class="contact__input hover-target" placeholder="votre adresse email" aria-label="Votre adresse email" required>.
+
+                <div class="contact__footer">
+                    <button type="submit" class="btn-magnetic hover-target">Envoyer ma demande</button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        © 2026 - Atelier Digital. Tous droits réservés.
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            gsap.registerPlugin(ScrollTrigger);
+
+            const isDesktop = window.matchMedia("(pointer: fine)").matches;
+            const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+            if (isDesktop) {
+                const cursorDot = document.querySelector('.cursor-dot');
+                const cursorCircle = document.querySelector('.cursor-circle');
+                const hoverTargets = document.querySelectorAll('.hover-target, a, button, input');
+
+                document.body.style.cursor = 'none';
+                cursorDot.style.opacity = '1';
+                cursorCircle.style.opacity = '1';
+
+                let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
+                let dotX = mouseX, dotY = mouseY;
+                let circleX = mouseX, circleY = mouseY;
+
+                window.addEventListener('mousemove', (e) => {
+                    mouseX = e.clientX; mouseY = e.clientY;
+                });
+
+                const renderCursor = () => {
+                    dotX += (mouseX - dotX) * 0.5;
+                    dotY += (mouseY - dotY) * 0.5;
+                    circleX += (mouseX - circleX) * 0.15;
+                    circleY += (mouseY - circleY) * 0.15;
+
+                    gsap.set(cursorDot, { x: dotX, y: dotY });
+                    gsap.set(cursorCircle, { x: circleX, y: circleY });
+                    requestAnimationFrame(renderCursor);
+                };
+                renderCursor();
+
+                hoverTargets.forEach(target => {
+                    target.addEventListener('mouseenter', () => cursorCircle.classList.add('cursor-circle--hover'));
+                    target.addEventListener('mouseleave', () => cursorCircle.classList.remove('cursor-circle--hover'));
+                });
+            }
+
+            if (!prefersReducedMotion) {
+                if (isDesktop) {
+                    const heroSection = document.querySelector('.hero');
+                    const heroTitle = document.querySelector('.hero__title');
+
+                    heroSection.addEventListener('mousemove', (e) => {
+                        const xOffset = (e.clientX / window.innerWidth - 0.5);
+                        const yOffset = (e.clientY / window.innerHeight - 0.5);
+                        gsap.to(heroTitle, { x: xOffset * 40, y: yOffset * 40, duration: 1, ease: "power2.out", overwrite: "auto" });
+                    });
+
+                    heroSection.addEventListener('mouseleave', () => {
+                        gsap.to(heroTitle, { x: 0, y: 0, duration: 1.5, ease: "elastic.out(1, 0.3)" });
+                    });
+                }
+
+                const projectCards = gsap.utils.toArray('.project-card');
+                projectCards.forEach((card, i) => {
+                    gsap.to(card, {
+                        scrollTrigger: { trigger: card, start: "top 85%", toggleActions: "play none none reverse" },
+                        clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
+                        y: 0, opacity: 1, duration: 1, ease: "power3.out", delay: i * 0.1
+                    });
+                });
+
+                if (isDesktop) {
+                    const magnetBtn = document.querySelector('.btn-magnetic');
+                    magnetBtn.addEventListener('mousemove', (e) => {
+                        const rect = magnetBtn.getBoundingClientRect();
+                        const x = (e.clientX - rect.left) - rect.width / 2;
+                        const y = (e.clientY - rect.top) - rect.height / 2;
+                        gsap.to(magnetBtn, { x: x * 0.3, y: y * 0.3, duration: 0.4, ease: "power2.out", overwrite: "auto" });
+                    });
+                    magnetBtn.addEventListener('mouseleave', () => {
+                        gsap.to(magnetBtn, { x: 0, y: 0, duration: 0.8, ease: "elastic.out(1, 0.3)" });
+                    });
+                }
+            } else {
+                gsap.set('.project-card', { clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)', y: 0, opacity: 1 });
+            }
+        });
+    </script>
+</body>
+</html>

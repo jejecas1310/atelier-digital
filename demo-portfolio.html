@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Démo de portfolio créatif pour studio d'architecture ou artisan.">
+    <title>Atelier Lumen | Architecture & Design</title>
+
+    <!-- Google Fonts: Playfair Display & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+
+    <!-- GSAP & ScrollTrigger -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        /* ==========================================================================
+           VARIABLES & RESET
+           ========================================================================== */
+        :root {
+            --color-bg: #F9F8F6;
+            --color-text: #1C1C1A;
+            --color-accent: #8A7356;
+            --font-heading: 'Playfair Display', serif;
+            --font-body: 'Inter', sans-serif;
+            --container-padding: clamp(1.5rem, 5vw, 4rem);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            font-family: var(--font-body);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        img {
+            max-width: 100%;
+            display: block;
+            object-fit: cover;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        h1, h2, h3 {
+            font-family: var(--font-heading);
+            font-weight: 400;
+        }
+
+        /* Utilitaires pour l'animation (Masquage de texte) */
+        .mask-line {
+            overflow: hidden;
+            display: block;
+        }
+
+        .mask-text {
+            display: inline-block;
+            transform: translateY(100%);
+        }
+
+        /* ==========================================================================
+           NAVIGATION & MENU PLEIN ÉCRAN
+           ========================================================================== */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 2rem var(--container-padding);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            color: white;
+            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .nav.scrolled {
+            background-color: rgba(249, 248, 246, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem var(--container-padding);
+            color: var(--color-text);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+
+        .nav.menu-open {
+            background-color: transparent !important;
+            backdrop-filter: none !important;
+            box-shadow: none !important;
+            color: white !important;
+        }
+
+        .nav__logo {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+            font-weight: 600;
+        }
+
+        .nav__menu {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .nav__menu::after {
+            content: '';
+            position: absolute;
+            bottom: -4px; left: 0; width: 100%; height: 1px;
+            background-color: currentColor;
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.4s ease;
+        }
+
+        .nav__menu:hover::after {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        /* Menu Overlay */
+        .menu-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100vh; height: 100svh;
+            z-index: 900;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .menu-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--color-text);
+            clip-path: circle(0% at calc(100% - var(--container-padding)) 3rem);
+            transition: clip-path 0.8s cubic-bezier(0.76, 0, 0.24, 1);
+        }
+
+        .menu-overlay.is-open {
+            pointer-events: all;
+        }
+
+        .menu-overlay.is-open .menu-bg {
+            clip-path: circle(150% at calc(100% - var(--container-padding)) 3rem);
+        }
+
+        .menu-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+        .menu-links {
+            list-style: none;
+        }
+
+        .menu-link {
+            font-family: var(--font-heading);
+            font-size: clamp(3rem, 8vw, 6rem);
+            color: var(--color-bg);
+            display: block;
+            margin-bottom: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .menu-link:hover {
+            color: var(--color-accent);
+        }
+
+        /* ==========================================================================
+           HERO SECTION
+           ========================================================================== */
+        .hero {
+            height: 100svh;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            background-color: #1C1C1A;
+        }
+
+        .hero__image-wrapper {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0; left: 0;
+            transform: scale(1.2);
+            background-color: #2A2A2A;
+        }
+
+        .hero__image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .hero__overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.1) 100%);
+        }
+
+        .hero__content {
+            position: absolute;
+            bottom: 12%;
+            left: var(--container-padding);
+            color: white;
+            max-width: 800px;
+            z-index: 2;
+        }
+
+        .hero__title {
+            font-size: clamp(3rem, 12vw, 7rem); 
+            line-height: 1;
+            margin-bottom: 1rem;
+        }
+
+        .hero__subtitle {
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            font-weight: 300;
+            letter-spacing: 1px;
+            opacity: 0.9;
+        }
+
+        /* ==========================================================================
+           BANDEAU DÉFILANT (MARQUEE)
+           ========================================================================== */
+        .marquee {
+            padding: 3rem 0;
+            background-color: var(--color-text);
+            color: var(--color-bg);
+            overflow: hidden;
+            display: flex;
+            white-space: nowrap;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .marquee__track {
+            display: flex;
+            animation: marquee 20s linear infinite;
+        }
+
+        .marquee__text {
+            font-family: var(--font-heading);
+            font-size: clamp(1.5rem, 3vw, 2.5rem);
+            font-style: italic;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .marquee__star {
+            color: var(--color-accent);
+            font-style: normal;
+            font-family: var(--font-body);
+            margin: 0 2rem;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* ==========================================================================
+           PHILOSOPHY
+           ========================================================================== */
+        .philosophy {
+            padding: 8rem var(--container-padding);
+            text-align: center;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .philosophy h2 {
+            font-size: clamp(1.8rem, 4vw, 3.5rem);
+            line-height: 1.4;
+        }
+
+        .philosophy i {
+            color: var(--color-accent);
+        }
+
+        /* ==========================================================================
+           GALERIE DE PROJETS
+           ========================================================================== */
+        .portfolio {
+            padding: 0 var(--container-padding) 8rem;
+        }
+
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .project-item {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .project-image-container {
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            background-color: #EAEAEA;
+            clip-path: inset(100% 0 0 0); 
+        }
+
+        .project-image {
+            width: 100%;
+            height: 120%;
+            object-fit: cover;
+            transform: translateY(-10%);
+            transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        @media (hover: hover) {
+            .project-item:hover .project-image {
+                transform: scale(1.05) translateY(-10%) !important; 
+            }
+        }
+
+        .project-info {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            overflow: hidden;
+        }
+
+        .project-title {
+            font-size: 1.5rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .project-category {
+            font-size: 0.85rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .project-1 { grid-column: 1 / 9; aspect-ratio: 16/10; }
+        .project-2 { grid-column: 10 / 13; aspect-ratio: 3/4; margin-top: -30%; }
+        .project-3 { grid-column: 2 / 12; aspect-ratio: 16/7; margin-top: 6rem; }
+
+        @media (max-width: 900px) {
+            .project-grid { display: block; }
+            .project-item {
+                aspect-ratio: 4/3;
+                margin-top: 0 !important;
+                margin-bottom: 4rem;
+            }
+        }
+
+        /* ==========================================================================
+           CURSEUR CREATIF SUR SURVOL
+           ========================================================================== */
+        .creative-cursor {
+            position: fixed;
+            top: 0; left: 0;
+            width: 90px; height: 90px;
+            background-color: var(--color-accent);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            opacity: 0;
+        }
+
+        .creative-cursor.show {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
+        /* ==========================================================================
+           FOOTER
+           ========================================================================== */
+        footer {
+            padding: 6rem var(--container-padding) 4rem;
+            text-align: center;
+            border-top: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .footer-logo {
+            font-family: var(--font-heading);
+            font-size: 3rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-contact {
+            font-size: 1.2rem;
+            margin-bottom: 4rem;
+        }
+
+        .footer-contact a {
+            position: relative;
+            color: var(--color-accent);
+            font-weight: 600;
+        }
+
+        .footer-contact a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px; left: 0; width: 100%; height: 1px;
+            background-color: currentColor;
+            transform: scaleX(1);
+            transition: transform 0.3s ease;
+        }
+
+        .footer-contact a:hover::after {
+            transform: scaleX(0);
+        }
+
+        .footer-credits {
+            font-size: 0.75rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="creative-cursor" id="cursor">Voir</div>
+
+    <nav class="nav" id="navbar">
+        <div class="nav__logo">Lumen.</div>
+        <div class="nav__menu" id="menu-toggle">Menu</div>
+    </nav>
+
+    <!-- MENU PLEIN ÉCRAN -->
+    <div class="menu-overlay" id="menu-overlay">
+        <div class="menu-bg"></div>
+        <div class="menu-content">
+            <ul class="menu-links">
+                <li><a href="#" class="menu-link hover-trigger"><span class="mask-line"><span class="mask-text menu-text-anim">Accueil</span></span></a></li>
+                <li><a href="#projets" class="menu-link hover-trigger"><span class="mask-line"><span class="mask-text menu-text-anim">Projets</span></span></a></li>
+                <li><a href="#studio" class="menu-link hover-trigger"><span class="mask-line"><span class="mask-text menu-text-anim">Le Studio</span></span></a></li>
+                <li><a href="#contact" class="menu-link hover-trigger"><span class="mask-line"><span class="mask-text menu-text-anim">Contact</span></span></a></li>
+            </ul>
+        </div>
+    </div>
+
+    <main>
+        <!-- HÉRO -->
+        <section class="hero" id="studio">
+            <div class="hero__image-wrapper" id="hero-img-wrapper" style="background-color: #2A2A2A;">
+                <img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?q=80&w=1200&auto=format&fit=crop" alt="Architecture d'intérieur minimaliste" class="hero__image">
+                <div class="hero__overlay"></div>
+            </div>
+            
+            <div class="hero__content">
+                <h1 class="hero__title">
+                    <span class="mask-line"><span class="mask-text hero-text-anim">Façonner</span></span>
+                    <span class="mask-line"><span class="mask-text hero-text-anim">l'espace.</span></span>
+                </h1>
+                <p class="hero__subtitle mask-line">
+                    <span class="mask-text hero-sub-anim">Studio d'Architecture et de Design d'Intérieur basé à Paris.</span>
+                </p>
+            </div>
+        </section>
+
+        <!-- BANDEAU MARQUEE -->
+        <div class="marquee">
+            <div class="marquee__track">
+                <span class="marquee__text">Architecture <span class="marquee__star">✦</span> Design d'Espace <span class="marquee__star">✦</span> Rénovation <span class="marquee__star">✦</span></span>
+                <span class="marquee__text">Architecture <span class="marquee__star">✦</span> Design d'Espace <span class="marquee__star">✦</span> Rénovation <span class="marquee__star">✦</span></span>
+                <span class="marquee__text">Architecture <span class="marquee__star">✦</span> Design d'Espace <span class="marquee__star">✦</span> Rénovation <span class="marquee__star">✦</span></span>
+                <span class="marquee__text">Architecture <span class="marquee__star">✦</span> Design d'Espace <span class="marquee__star">✦</span> Rénovation <span class="marquee__star">✦</span></span>
+            </div>
+        </div>
+
+        <!-- PHILOSOPHIE -->
+        <section class="philosophy">
+            <h2 id="philo-text">Nous croyons que l'architecture n'est pas qu'une question de murs, mais <i>de lumière, de matières et d'émotions</i>. Chaque projet est une réponse unique à son environnement.</h2>
+        </section>
+
+        <!-- GALERIE -->
+        <section class="portfolio" id="projets">
+            <div class="project-grid">
+                
+                <article class="project-item project-1">
+                    <div class="project-image-container hover-trigger">
+                        <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=1200&auto=format&fit=crop" alt="Villa sur la côte" class="project-image">
+                    </div>
+                    <div class="project-info">
+                        <h3 class="project-title mask-line"><span class="mask-text project-text">Villa Méditerranée</span></h3>
+                        <span class="project-category mask-line"><span class="mask-text project-text">Résidentiel</span></span>
+                    </div>
+                </article>
+
+                <article class="project-item project-2">
+                    <div class="project-image-container hover-trigger">
+                        <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=800&auto=format&fit=crop" alt="Escalier moderne en bois" class="project-image">
+                    </div>
+                    <div class="project-info">
+                        <h3 class="project-title mask-line"><span class="mask-text project-text">Loft Haussmann</span></h3>
+                        <span class="project-category mask-line"><span class="mask-text project-text">Rénovation</span></span>
+                    </div>
+                </article>
+
+                <article class="project-item project-3">
+                    <div class="project-image-container hover-trigger">
+                        <img src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?q=80&w=1400&auto=format&fit=crop" alt="Galerie d'art moderne" class="project-image">
+                    </div>
+                    <div class="project-info">
+                        <h3 class="project-title mask-line"><span class="mask-text project-text">Galerie Horizon</span></h3>
+                        <span class="project-category mask-line"><span class="mask-text project-text">Espace Public</span></span>
+                    </div>
+                </article>
+
+            </div>
+        </section>
+    </main>
+
+    <footer id="contact">
+        <div class="footer-logo">Lumen.</div>
+        <div class="footer-contact">
+            Pour toute demande de projet : <br><br>
+            <a href="mailto:hello@atelier-lumen.com">hello@atelier-lumen.com</a>
+        </div>
+        <div class="footer-credits">
+            © 2026 Atelier Lumen. Design de démonstration sur-mesure.
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            gsap.registerPlugin(ScrollTrigger);
+
+            // ==========================================
+            // 1. CHANGEMENT D'ÉTAT DE LA NAVBAR & MENU
+            // ==========================================
+            const navbar = document.getElementById('navbar');
+            const menuToggle = document.getElementById('menu-toggle');
+            const menuOverlay = document.getElementById('menu-overlay');
+            let isMenuOpen = false;
+            let menuAnim;
+
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 100 && !isMenuOpen) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+
+            menuToggle.addEventListener('click', () => {
+                isMenuOpen = !isMenuOpen;
+                
+                if (isMenuOpen) {
+                    menuToggle.innerText = "Fermer";
+                    navbar.classList.add('menu-open');
+                    menuOverlay.classList.add('is-open');
+                    
+                    menuAnim = gsap.to(".menu-text-anim", {
+                        y: "0%",
+                        duration: 0.8,
+                        stagger: 0.1,
+                        ease: "power4.out",
+                        delay: 0.3 
+                    });
+                } else {
+                    menuToggle.innerText = "Menu";
+                    navbar.classList.remove('menu-open');
+                    menuOverlay.classList.remove('is-open');
+                    
+                    if(menuAnim) menuAnim.kill();
+                    gsap.to(".menu-text-anim", { y: "100%", duration: 0.4, ease: "power2.in" });
+                    
+                    if (window.scrollY > 100) navbar.classList.add('scrolled');
+                }
+            });
+
+            const menuLinks = document.querySelectorAll('.menu-link');
+            menuLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    if(isMenuOpen) menuToggle.click();
+                });
+            });
+
+            // ==========================================
+            // 2. ANIMATIONS DE CHARGEMENT (HERO)
+            // ==========================================
+            const tlHero = gsap.timeline();
+
+            tlHero.to("#hero-img-wrapper", {
+                scale: 1,
+                duration: 2,
+                ease: "power3.inOut"
+            })
+            .to(".hero-text-anim", {
+                y: "0%",
+                duration: 1.2,
+                stagger: 0.2,
+                ease: "power4.out"
+            }, "-=1")
+            .to(".hero-sub-anim", {
+                y: "0%",
+                duration: 1,
+                ease: "power4.out"
+            }, "-=0.8");
+
+            // ==========================================
+            // 3. ANIMATION DU TEXTE "PHILOSOPHIE"
+            // ==========================================
+            gsap.from("#philo-text", {
+                scrollTrigger: {
+                    trigger: ".philosophy",
+                    start: "top 80%",
+                },
+                y: 50,
+                opacity: 0,
+                duration: 1.5,
+                ease: "power3.out"
+            });
+
+            // ==========================================
+            // 4. ANIMATION DES PROJETS (Clip-Path + Parallax)
+            // ==========================================
+            const projects = gsap.utils.toArray('.project-item');
+
+            projects.forEach((project) => {
+                const container = project.querySelector('.project-image-container');
+                const image = project.querySelector('.project-image');
+                const textElements = project.querySelectorAll('.project-text');
+
+                const tlProject = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: project,
+                        start: "top 75%",
+                    }
+                });
+
+                tlProject.to(container, {
+                    clipPath: "inset(0% 0% 0% 0%)",
+                    duration: 1.5,
+                    ease: "power4.inOut"
+                })
+                .from(image, {
+                    scale: 1.2,
+                    duration: 1.5,
+                    ease: "power4.inOut"
+                }, "-=1.5")
+                .to(textElements, {
+                    y: "0%",
+                    duration: 0.8,
+                    stagger: 0.1,
+                    ease: "power3.out"
+                }, "-=0.8");
+
+                if (window.matchMedia("(min-width: 768px)").matches) {
+                    gsap.to(image, {
+                        scrollTrigger: {
+                            trigger: project,
+                            start: "top bottom",
+                            end: "bottom top",
+                            scrub: true
+                        },
+                        y: "10%",
+                        ease: "none"
+                    });
+                }
+            });
+
+            // ==========================================
+            // 5. CURSEUR CRÉATIF (Uniquement Desktop)
+            // ==========================================
+            const isDesktop = window.matchMedia("(pointer: fine)").matches;
+            if (isDesktop) {
+                const cursor = document.getElementById('cursor');
+                const triggers = document.querySelectorAll('.hover-trigger');
+                let mouseX = 0, mouseY = 0;
+                let cursorX = 0, cursorY = 0;
+
+                window.addEventListener('mousemove', (e) => {
+                    mouseX = e.clientX;
+                    mouseY = e.clientY;
+                });
+
+                function animateCursor() {
+                    cursorX += (mouseX - cursorX) * 0.15;
+                    cursorY += (mouseY - cursorY) * 0.15;
+                    cursor.style.left = `${cursorX}px`;
+                    cursor.style.top = `${cursorY}px`;
+                    requestAnimationFrame(animateCursor);
+                }
+                animateCursor();
+
+                triggers.forEach(trigger => {
+                    trigger.addEventListener('mouseenter', () => {
+                        cursor.classList.add('show');
+                        trigger.style.cursor = 'none'; 
+                    });
+                    trigger.addEventListener('mouseleave', () => {
+                        cursor.classList.remove('show');
+                        trigger.style.cursor = ''; 
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>
