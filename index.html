@@ -509,20 +509,25 @@
                 C'est le moyen le plus rapide pour que je comprenne votre besoin avant de vous recontacter !
             </p>
 
-            <form class="contact__form" onsubmit="event.preventDefault(); alert('Message de test ! Plus tard, nous relierons ce bouton à votre boite mail.');">
+            <!-- On modifie le onsubmit et on ajoute des 'id' aux inputs pour les récupérer -->
+            <form class="contact__form" onsubmit="envoyerEmail(event)">
                 Bonjour, je m'appelle 
-                <input type="text" class="contact__input hover-target" placeholder="votre nom" aria-label="Votre nom" required> 
+                <input type="text" id="nom" class="contact__input hover-target" placeholder="votre nom" aria-label="Votre nom" required> 
                 et je gère 
-                <input type="text" class="contact__input hover-target" placeholder="votre entreprise" aria-label="Votre entreprise">. 
+                <input type="text" id="entreprise" class="contact__input hover-target" placeholder="votre entreprise" aria-label="Votre entreprise">. 
                 <br><br>
                 J'ai besoin de vos services pour 
-                <input type="text" class="contact__input hover-target" placeholder="créer un site internet, refaire mon logo..." aria-label="Votre projet" required>.
+                <input type="text" id="besoin" class="contact__input hover-target" placeholder="créer un site internet, refaire mon logo..." aria-label="Votre projet" required>.
                 Vous pouvez me contacter à cette adresse :
-                <input type="email" class="contact__input hover-target" placeholder="votre adresse email" aria-label="Votre adresse email" required>.
+                <input type="email" id="email" class="contact__input hover-target" placeholder="votre adresse email" aria-label="Votre adresse email" required>.
 
                 <div class="contact__footer">
                     <button type="submit" class="btn-magnetic hover-target">Envoyer ma demande</button>
                 </div>
+                
+                <p style="margin-top: 2rem; font-size: 0.9rem; color: var(--text-muted); text-align: center;">
+                    Ou écrivez-moi directement à <a href="mailto:contact@mynexvia.fr" class="hover-target" style="color: var(--text-color); text-decoration: underline;">contact@mynexvia.fr</a>
+                </p>
             </form>
         </section>
     </main>
@@ -614,6 +619,25 @@
                 gsap.set('.project-card', { clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)', y: 0, opacity: 1 });
             }
         });
+
+        // NOUVELLE FONCTION : Préparation et envoi de l'email
+        function envoyerEmail(event) {
+            event.preventDefault(); // Empêche la page de se recharger
+
+            // Récupération des valeurs tapées par l'utilisateur
+            const nom = document.getElementById('nom').value;
+            const entreprise = document.getElementById('entreprise').value || "mon entreprise";
+            const besoin = document.getElementById('besoin').value;
+            const email = document.getElementById('email').value;
+
+            // Paramétrage de l'email de destination
+            const destinataire = "contact@mynexvia.fr";
+            const sujet = encodeURIComponent(`Nouvelle demande de ${nom} - Projet Web`);
+            const corps = encodeURIComponent(`Bonjour,\n\nJe m'appelle ${nom} et je gère ${entreprise}.\n\nJ'ai besoin de vos services pour : ${besoin}.\n\nVous pouvez me contacter à cette adresse email : ${email}\n\nCordialement.`);
+
+            // Ouverture du client mail (Outlook, Mail, etc.) avec les infos pré-remplies
+            window.location.href = `mailto:${destinataire}?subject=${sujet}&body=${corps}`;
+        }
     </script>
 </body>
 </html>
